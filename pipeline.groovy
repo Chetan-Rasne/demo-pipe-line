@@ -13,7 +13,7 @@ pipeline {
         }
         stage ("Test"){
             steps {
-                sh ''' /opt/maven/bin/mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                sh ''' mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
   		-Dsonar.projectKey=student-b42 \
   		-Dsonar.projectName='student-b42' \
   		-Dsonar.host.url=http://15.206.116.70:9000 \
