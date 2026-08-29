@@ -1,34 +1,49 @@
 pipeline {
     agent any
+
     stages {
-        stage ("Pull"){
+
+        stage("Pull") {
             steps {
-                git ' https://github.com/cloudmaster2025/sonar.git'
+                git 'https://github.com/cloudmaster2025/sonar.git'
             }
         }
-        stage ("Build"){
+
+        stage("Build") {
             steps {
                 sh '/opt/apache-maven-3.9.16/bin/mvn clean package'
             }
         }
-        stage ("Test"){
-            steps {
-                sh ''' mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-  		-Dsonar.projectKey=student-b42 \
-  		-Dsonar.projectName='student-b42' \
-  		-Dsonar.host.url=http://15.206.116.70:9000 \
-  		-Dsonar.token=sqp_c9482d0d6b12aeca88eb0dac1fa230dcf3230590'''
 
+        stage("Test") {
+            steps {
+                withSonarQubeEnv(
+                    installationName: 'sonar',
+                    credentialsId: 'sonar-token'
+                ) {
+                    sh '''
+                        mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                        -Dsonar.projectKey=student-app \
+                        -Dsonar.projectName='student-app'
+                    '''
+                }
             }
         }
-        stage ("Deploy"){
+
+        stage("Quality-Gate") {
+            steps {
+                timeout(time: 10, unit: 'SECONDS') {
+                waitForQualityGate abortPipeline: true, credentialsId: 'sonar-token'
+                
+                }
+               
+            }
+        }
+
+        stage("Deploy") {
             steps {
                 echo 'Deploy success'
             }
         }
-        
-        
-        
-        
-    }    
+    }
 }
