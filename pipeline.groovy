@@ -42,7 +42,7 @@ pipeline {
 
         stage("Deploy") {
             steps {
-                echo 'Deploy success'
+               deploy adapters: [tomcat9(alternativeDeploymentContext: '', credentialsId: 'admin-tomcat', path: '', url: 'http://13.201.226.252:8080')], contextPath: 'student.war', war: 'target/*.war'
             }
         }
     }
